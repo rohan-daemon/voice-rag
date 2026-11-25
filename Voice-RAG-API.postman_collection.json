@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "voice-rag-java-collection",
+		"name": "Voice RAG Java API",
+		"description": "Postman collection for Voice RAG Java service APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	],
+	"item": [
+		{
+			"name": "Home Page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/",
+					"host": ["{{baseUrl}}"],
+					"path": [""]
+				},
+				"description": "Get the home page. Returns HTML with index status."
+			},
+			"response": []
+		},
+		{
+			"name": "Transcribe All Recordings",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{baseUrl}}/transcribe",
+					"host": ["{{baseUrl}}"],
+					"path": ["transcribe"]
+				},
+				"description": "Transcribe all audio recordings from the configured recordings directory using Whisper."
+			},
+			"response": []
+		},
+		{
+			"name": "Build Index",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{baseUrl}}/index",
+					"host": ["{{baseUrl}}"],
+					"path": ["index"]
+				},
+				"description": "Build the embedding index from transcribed text files. Chunks the text and stores embeddings in Chroma DB."
+			},
+			"response": []
+		},
+		{
+			"name": "Search",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/search?query=what was discussed&maxResults=5",
+					"host": ["{{baseUrl}}"],
+					"path": ["search"],
+					"query": [
+						{
+							"key": "query",
+							"value": "what was discussed",
+							"description": "The search query text"
+						},
+						{
+							"key": "maxResults",
+							"value": "5",
+							"description": "Maximum number of results to return (default: 5)"
+						}
+					]
+				},
+				"description": "Semantic search over indexed transcripts. Returns relevant text chunks with similarity scores."
+			},
+			"response": []
+		}
+	]
+}

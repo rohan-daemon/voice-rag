@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Notes RAG</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; margin-bottom: 30px; }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h2 { margin-top: 0; color: #555; font-size: 1.2em; }
+        button, .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover, .btn:hover { background: #0056b3; }
+        button.secondary { background: #6c757d; }
+        button.secondary:hover { background: #545b62; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #cce5ff; color: #004085; }
+        .status.skipped { background: #fff3cd; color: #856404; }
+        .result {
+            border-left: 3px solid #007bff;
+            padding: 15px;
+            margin: 15px 0;
+            background: #f8f9fa;
+        }
+        .result .source { font-weight: bold; color: #007bff; margin-bottom: 5px; }
+        .result .score { color: #6c757d; font-size: 0.85em; }
+        .result .content { margin-top: 10px; line-height: 1.6; }
+        .actions { display: flex; gap: 10px; margin-bottom: 20px; }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            background: #28a745;
+            color: white;
+        }
+        .badge.not-ready { background: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>Voice Notes Search</h1>
+
+    <div class="card">
+        <h2>Setup</h2>
+        <div class="actions">
+            <form th:action="@{/transcribe}" method="post" style="display:inline;">
+                <button type="submit">1. Transcribe Recordings</button>
+            </form>
+            <form th:action="@{/index}" method="post" style="display:inline;">
+                <button type="submit" class="secondary">2. Build Index</button>
+            </form>
+        </div>
+        <p>
+            Index Status:
+            <span th:if="${indexed}" class="badge">Ready</span>
+            <span th:unless="${indexed}" class="badge not-ready">Not Built</span>
+        </p>
+
+        <div th:if="${transcriptionResults}">
+            <h3>Transcription Results</h3>
+            <div th:each="result : ${transcriptionResults}" th:class="'status ' + ${result.status}">
+                <strong th:text="${result.fileName}">file.mp3</strong>:
+                <span th:text="${result.message}">message</span>
+            </div>
+        </div>
+
+        <div th:if="${indexResult}" class="status success" th:text="${indexResult}">Index result</div>
+    </div>
+
+    <div class="card">
+        <h2>Search</h2>
+        <form th:action="@{/search}" method="get">
+            <input type="text" name="query" th:value="${query}" placeholder="What did I say about..." autofocus>
+            <button type="submit">Search</button>
+        </form>
+
+        <div th:if="${searchResults != null && searchResults.empty}" class="status info">
+            No results found.
+        </div>
+
+        <div th:if="${searchResults != null && !searchResults.empty}">
+            <div th:each="result, iter : ${searchResults}" class="result">
+                <div class="source">
+                    [<span th:text="${iter.index + 1}">1</span>] From: <span th:text="${result.source}">file.txt</span>
+                    <span class="score">(score: <span th:text="${#numbers.formatDecimal(result.score, 1, 3)}">0.85</span>)</span>
+                </div>
+                <div class="content" th:text="${result.content}">Content here...</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
