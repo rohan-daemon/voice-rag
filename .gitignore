@@ -1,0 +1,11 @@
+target/
+.DS_Store
+.idea/
+.claude/
+.env
+.env.*
+*.log
+transcripts/
+recordings/
+response.html
+response-1.html
